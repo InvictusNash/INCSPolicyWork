@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INCS Policy Architecture</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --navy: #1a2744;
+  --slate: #2e3f6e;
+  --gold: #c9922a;
+  --gold-light: #f0d49a;
+  --cream: #fdf9f3;
+  --white: #ffffff;
+  --red: #b83232;
+  --red-light: #fce8e8;
+  --amber: #c97a1a;
+  --amber-light: #fef0dc;
+  --green: #1e6e4e;
+  --green-light: #e4f4ec;
+  --blue: #1a4f8a;
+  --blue-light: #e6eef8;
+  --purple: #5e3598;
+  --purple-light: #f0eafc;
+  --teal: #0e6b72;
+  --teal-light: #e0f4f5;
+  --border: #dde3f0;
+  --text: #1a2744;
+  --muted: #6b7a9a;
+  --bg2: #f4f6fc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* ── Page header ── */
+.page-header {
+  background: var(--navy);
+  color: var(--white);
+  padding: 36px 48px 30px;
+  border-bottom: 4px solid var(--gold);
+}
+.page-header .kicker {
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.page-header h1 {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+.page-header .sub {
+  font-size: 13px;
+  color: #a8b4cc;
+  max-width: 640px;
+  line-height: 1.6;
+}
+.page-header .meta {
+  display: flex;
+  gap: 24px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.page-header .meta span {
+  font-size: 11px;
+  color: #7a88a8;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  background: var(--white);
+  border-bottom: 2px solid var(--border);
+  padding: 0 48px;
+  overflow-x: auto;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.tab {
+  padding: 13px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  color: var(--muted);
+  transition: all 0.15s;
+  user-select: none;
+  letter-spacing: 0.3px;
+}
+.tab:hover { color: var(--navy); }
+.tab.active { color: var(--navy); border-bottom-color: var(--gold); }
+
+/* ── Content ── */
+.content { padding: 32px 48px 64px; max-width: 1100px; margin: 0 auto; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Section title ── */
+.section-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.section-lead {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 680px;
+  line-height: 1.7;
+  margin-bottom: 28px;
+}
+
+/* ── Callout box ── */
+.callout {
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+.callout.principle {
+  background: var(--blue-light);
+  border-left: 4px solid var(--blue);
+  color: var(--blue);
+}
+.callout strong { font-weight: 600; }
+
+/* ── Tier cards ── */
+.tier {
+  margin-bottom: 28px;
+}
+.tier-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.tier-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 3px;
+}
+.tier-badge.t1 { background: var(--navy); color: var(--gold-light); }
+.tier-badge.t2 { background: var(--slate); color: #c8d4f0; }
+.tier-badge.t3 { background: #3a5080; color: #c0d0ee; }
+.tier-badge.t4 { background: var(--teal); color: #c0ecf0; }
+.tier-badge.t5 { background: #5a4020; color: #f0d8b0; }
+
+.tier-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.tier-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.doc-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  border-left: 4px solid;
+}
+.doc-card.t1 { border-left-color: var(--navy); }
+.doc-card.t2 { border-left-color: var(--slate); }
+.doc-card.t3 { border-left-color: #3a5080; }
+.doc-card.t4 { border-left-color: var(--teal); }
+.doc-card.t5 { border-left-color: #5a4020; }
+
+.doc-card-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+.doc-card-role {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.doc-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.tag {
+  background: var(--bg2);
+  color: var(--slate);
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+.tag.owner { background: var(--amber-light); color: var(--amber); }
+.tag.cycle { background: var(--green-light); color: var(--green); }
+.tag.public { background: var(--teal-light); color: var(--teal); }
+.tag.confidential { background: var(--red-light); color: var(--red); }
+.tag.board { background: var(--purple-light); color: var(--purple); }
+
+/* ── Single-content rules ── */
+.rules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 700px) { .rules-grid { grid-template-columns: 1fr; } }
+
+.rule-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+.rule-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+  margin-bottom: 6px;
+}
+.rule-card p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.rule-card .lives-in {
+  margin-top: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+  background: var(--green-light);
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* ── Reference table ── */
+.ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  font-size: 12px;
+}
+.ref-table thead tr { background: var(--navy); color: var(--white); }
+.ref-table thead th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.ref-table tbody tr:nth-child(even) { background: var(--bg2); }
+.ref-table tbody tr:hover { background: #eef1fb; }
+.ref-table tbody td {
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.ref-table tbody td:first-child { font-weight: 600; color: var(--navy); }
+
+/* ── Hierarchy diagram (SVG inline) ── */
+.diagram-wrap {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 28px;
+  overflow-x: auto;
+}
+
+/* ── Divider ── */
+hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+
+/* ── Appendix table ── */
+.appendix-section {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.appendix-header {
+  background: var(--bg2);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.appendix-header .doc-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.appendix-header .doc-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.appendix-body { padding: 14px 16px; }
+.appendix-body ul {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px 20px;
+}
+.appendix-body ul li {
+  font-size: 12px;
+  color: var(--text);
+  padding: 3px 0;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.appendix-body ul li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ── Decision matrix ── */
+.decision-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 800px) { .decision-grid { grid-template-columns: 1fr; } }
+
+.decision-card {
+  border-radius: 6px;
+  padding: 16px;
+  border: 1px solid;
+}
+.decision-card.standalone {
+  background: var(--green-light);
+  border-color: #aadcc4;
+}
+.decision-card.appendix {
+  background: var(--amber-light);
+  border-color: #f0c878;
+}
+.decision-card.eliminate {
+  background: var(--red-light);
+  border-color: #f0b8b8;
+}
+.decision-card h3 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.decision-card.standalone h3 { color: var(--green); }
+.decision-card.appendix h3 { color: var(--amber); }
+.decision-card.eliminate h3 { color: var(--red); }
+.decision-card .criterion { font-size: 12px; color: var(--text); margin-bottom: 6px; line-height: 1.5; }
+.decision-card .examples { font-size: 11px; color: var(--muted); font-style: italic; }
+
+/* ── Priority row ── */
+.priority-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.priority-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.priority-num.high { background: var(--navy); color: var(--white); }
+.priority-num.med { background: var(--amber-light); color: var(--amber); }
+.priority-num.low { background: var(--bg2); color: var(--muted); }
+.priority-body h4 { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; }
+.priority-body p { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.priority-body .meta { font-size: 11px; color: var(--teal); font-weight: 600; margin-top: 5px; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="kicker">Invictus Nashville Charter School</div>
+  <h1>Proposed Policy Architecture</h1>
+  <p class="sub">A governance framework for consolidating, standardizing, and maintaining INCS policy documents across all operational domains. Built from analysis of 8 policy documents + 3 compliance frameworks: TPCSC Subrecipient Monitoring Tool (2026), TN Child Care Standards (Chapter 0520-12-01, 2024), and the updated Employee Handbook 2026-27. Updated June 2026 to reflect remediation progress.</p>
+  <div class="meta">
+    <span>⬡ 5-Tier Document Hierarchy</span>
+    <span>◈ 8 Standalone Documents</span>
+    <span>⚠ 3 Compliance Frameworks Integrated</span>
+    <span>◇ Single-Source Rules for 12 Policy Domains</span>
+    <span>◉ Updated June 2026</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showView('hierarchy',this)">Governance Hierarchy</div>
+  <div class="tab" onclick="showView('standalone',this)">Standalone Documents</div>
+  <div class="tab" onclick="showView('single',this)">Single-Source Rules</div>
+  <div class="tab" onclick="showView('appendices',this)">What Becomes an Appendix</div>
+  <div class="tab" onclick="showView('sequence',this)">Implementation Sequence</div>
+</div>
+
+<div class="content">
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- VIEW 1: GOVERNANCE HIERARCHY -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view active" id="view-hierarchy">
+
+  <p class="section-title">The Five-Tier Policy Hierarchy</p>
+  <p class="section-lead">Every INCS policy document should occupy a defined tier. Tier determines authority, update process, audience, and what can reference it. A higher-tier document always prevails in a conflict. No policy content should exist in two documents at the same tier.</p>
+
+  <div class="callout principle">
+    <strong>Core principle:</strong> Each policy domain has exactly one authoritative home. All other documents may reference that home — they may never reproduce it. A policy that lives in two places is a policy you'll have to update twice, and the second update will always be forgotten.
+  </div>
+
+  <!-- Tier 1 -->
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge t1">Tier 1</span>
+      <div>
+        <div class="tier-title">Board Governance Documents</div>
+        <div class="tier-desc">Board-adopted. Highest authority. Establishes legal obligations, authorizer compliance, and school identity.</div>
+      </div>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-card t1">
+        <div class="doc-card-name">Policy Handbook (Revised)</div>
+        <div class="doc-card-role">The master compliance document satisfying Charter Commission LEA policy requirements. Contains all board-level policies: governance, ethics, grievance, records, student rights, discipline, special populations. All other documents exist beneath or beside this one.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Board + Head of Schools</span>
+          <span class="tag cycle">Review: Annual (Board)</span>
+          <span class="tag public">Public-facing</span>
+        </div>
+      </div>
+      <div class="doc-card t1">
+        <div class="doc-card-name">Financial Policies &amp; Procedures</div>
+        <div class="doc-card-role">Standalone financial governance document. Authoritative on all fiscal controls, procurement, grant compliance, and budgeting. Referenced by (not reproduced in) the Policy Handbook's financial section. Board-approved; updated as regulations change.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Board Treasurer + Exec Director</span>
+          <span class="tag cycle">Review: Annual (Board)</span>
+          <span class="tag board">Board-adopted</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier 2 -->
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge t2">Tier 2</span>
+      <div>
+        <div class="tier-title">Regulatory Compliance Documents</div>
+        <div class="tier-desc">Required by federal or state law. Cannot be materially altered. Updated when law or regulation changes. Board acknowledges but does not redraft.</div>
+      </div>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-card t2">
+        <div class="doc-card-name">School Nutrition &amp; Wellness Policy</div>
+        <div class="doc-card-role">Federally required Local School Wellness Policy (USDA / HHFKA). Governs nutrition, physical activity, SEL, and health services. Must be publicly posted. The HACCP Plan is an appendix to this document, not separate.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Head of Schools (Wellness Coordinator)</span>
+          <span class="tag cycle">Review: Annual (Healthy School Team)</span>
+          <span class="tag public">Public-facing</span>
+        </div>
+      </div>
+      <div class="doc-card t2">
+        <div class="doc-card-name">Emergency Operations Plan (EOP)</div>
+        <div class="doc-card-role">Required by TN SAVE Act (T.C.A. § 49-6-801–818). Authoritative on all emergency response, physical security, threat assessment, and COOP. Confidential — exempt from public records requests. The Policy Handbook's safety section references this document, not vice versa.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Director of Operations</span>
+          <span class="tag cycle">Review: Annual (Safety Team)</span>
+          <span class="tag confidential">Confidential (T.C.A. 49-6-808)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier 3 -->
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge t3">Tier 3</span>
+      <div>
+        <div class="tier-title">Operational Policy Documents</div>
+        <div class="tier-desc">Leader-adopted. Governs staff employment, school operations, and day-to-day standards. Updated by the Head of Schools or Director of Operations with board notification. Must be consistent with Tier 1 and Tier 2.</div>
+      </div>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-card t3">
+        <div class="doc-card-name">Employee Handbook 2026-27 <span style="font-size:10px;background:#e4f4ec;color:#1e6e4e;padding:2px 6px;border-radius:3px;margin-left:5px">FINAL</span></div>
+        <div class="doc-card-role">The authoritative HR document for all staff. The 2026-27 version is substantially improved: adds DHS dual background-check compliance, Section 7 Student Protection, federal whistleblower protections, USDA nondiscrimination appendix, lactation accommodations, and explicit EOP cross-reference. Must be read alongside Child Care Standards (Chapter 0520-12-01) for full compliance — several required staff training and documentation standards are not yet captured. Contains its own acknowledgment page — the separate acknowledgment form (Doc 2) is retired.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Head of Schools + Director of Operations</span>
+          <span class="tag cycle">Review: Annual (pre-service)</span>
+          <span class="tag" style="background:#fce8e8;color:#b83232">DHS compliance layer</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier 4 -->
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge t4">Tier 4</span>
+      <div>
+        <div class="tier-title">Community-Facing Documents</div>
+        <div class="tier-desc">Written for families and the public. Derive from Tier 1–3 documents — they summarize and translate, but never create policy. If a family-facing rule conflicts with an internal policy, the internal policy wins and the family-facing document must be corrected.</div>
+      </div>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-card t4">
+        <div class="doc-card-name">Student &amp; Family Handbook 2026-27 <span style="font-size:10px;background:#e4f4ec;color:#1e6e4e;padding:2px 6px;border-radius:3px;margin-left:5px">FINAL (2 items open)</span></div>
+        <div class="doc-card-role">Remediated June 2026 against all 13 gap items, all 25 TPCSC Student Handbook Requirements, Tennessee Child Care Standards, and three new legislative items (Pub. Ch. 808, Pub. Ch. 850, Instructional Materials Assurance). Board adopts the handbook as policy; operative language used throughout. Two items remain open pending decisions: (1) board decision on whether to include Commission LEA Policy 6304 full text; (2) EOP cross-reference correction (separate document action). Neither blocks distribution.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Head of Schools</span>
+          <span class="tag cycle">Review: Annual (July)</span>
+          <span class="tag public">Public-facing</span>
+          <span class="tag" style="background:#fef3e2;color:#c97a1a">2 items pending</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tier 5 -->
+  <div class="tier">
+    <div class="tier-header">
+      <span class="tier-badge t5">Tier 5</span>
+      <div>
+        <div class="tier-title">Technical &amp; Operational Plans</div>
+        <div class="tier-desc">Operational, not policy-creating. Managed by the responsible operational staff. Reviewed on regulatory or operational schedules. Referenced from Tier 1–2 documents but maintained independently.</div>
+      </div>
+    </div>
+    <div class="doc-grid">
+      <div class="doc-card t5">
+        <div class="doc-card-name">HACCP-Based Food Safety Plan</div>
+        <div class="doc-card-role">USDA-required food safety plan for NSLP/SBP participation. Managed by the Director of Operations in partnership with Panache Catering (FSMC). Should be converted to a text-accessible PDF and referenced from the Wellness Policy — not maintained as a standalone ZIP of scanned images.</div>
+        <div class="doc-card-tags">
+          <span class="tag owner">Owner: Director of Operations + FSMC</span>
+          <span class="tag cycle">Review: Annual + whenever menu changes</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- Hierarchy rules -->
+  <p class="section-title" style="font-size:17px;margin-bottom:12px">Hierarchy Rules</p>
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Rule</th>
+        <th>What it means in practice</th>
+        <th>Who enforces it</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Higher tier prevails</td>
+        <td>If the Employee Handbook says something different from the Policy Handbook, the Policy Handbook governs. The Employee Handbook must be corrected.</td>
+        <td>Head of Schools</td>
+      </tr>
+      <tr>
+        <td>One authoritative source per topic</td>
+        <td>Conflict of Interest policy lives in one place. Reimbursement policy lives in one place. Every other document references that location — it does not restate the rule.</td>
+        <td>Director of Operations</td>
+      </tr>
+      <tr>
+        <td>Tier 4 never creates policy</td>
+        <td>The Student/Family Handbook can say "see our Attendance Policy" but cannot establish a different threshold or consequence than what the Policy Handbook says.</td>
+        <td>Head of Schools</td>
+      </tr>
+      <tr>
+        <td>Regulatory documents are not rewritten</td>
+        <td>The EOP and Wellness Policy follow mandated formats. Internal documents reference them; they do not absorb or summarize them.</td>
+        <td>Director of Operations</td>
+      </tr>
+      <tr>
+        <td>Amendments flow downward</td>
+        <td>When the Policy Handbook changes, the Employee Handbook and Family Handbook must be reviewed within 30 days. Tier 4 always reflects Tier 1.</td>
+        <td>Head of Schools</td>
+      </tr>
+      <tr>
+        <td>Each document has a named owner</td>
+        <td>Every document in the architecture has one person responsible for maintaining it, reviewing it on schedule, and flagging conflicts. "HR" and "leadership" are not owners — a person is.</td>
+        <td>Head of Schools (assigns)</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- VIEW 2: STANDALONE DOCUMENTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="view-standalone">
+
+  <p class="section-title">What Stands Alone — and Why</p>
+  <p class="section-lead">A document earns standalone status when it has a distinct legal mandate, a separate audience, a regulatory update cycle, or operational scope that doesn't belong nested inside another document. The test: would merging this into another document make it harder to find, harder to update, or harder to comply with?</p>
+
+  <div class="callout principle">
+    <strong>Decision criteria for standalone status:</strong> The document has (1) a distinct legal or regulatory mandate requiring it to exist as its own artifact, (2) a defined audience that differs from the primary document's audience, (3) a separate update cadence driven by external regulation, or (4) content sensitive enough to require different access controls than the main document.
+  </div>
+
+  <!-- The three decisions -->
+  <div class="decision-grid" style="margin-bottom:28px">
+    <div class="decision-card standalone">
+      <h3>Standalone ✓</h3>
+      <p class="criterion">Has its own legal mandate OR distinct audience OR different update driver OR access control requirement. Would be harder to maintain if nested.</p>
+      <p class="examples">Policy Handbook, Financial Policies, Wellness Policy, EOP, Employee Handbook, Family Handbook, HACCP Plan</p>
+    </div>
+    <div class="decision-card appendix">
+      <h3>Appendix to a parent ↓</h3>
+      <p class="criterion">Supports a parent document's compliance. Too technical or specialized for the body of the document. Has no independent regulatory mandate — just contextual utility.</p>
+      <p class="examples">HACCP appendix to Wellness Policy, FERPA opt-out form, drill schedules, snack standards, background check policy detail</p>
+    </div>
+    <div class="decision-card eliminate">
+      <h3>Retire or merge ✗</h3>
+      <p class="criterion">Duplicates content that exists authoritatively elsewhere. Was created to fill a gap that no longer exists. Adds maintenance burden without adding governance value.</p>
+      <p class="examples">Employee Handbook acknowledgment form (Doc 2) — the Employee Handbook has its own acknowledgment page</p>
+    </div>
+  </div>
+
+  <hr>
+
+  <p style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:16px">The Eight Standalone Documents in the Proposed Architecture</p>
+
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Document</th>
+        <th>Tier</th>
+        <th>Standalone because</th>
+        <th>Owner</th>
+        <th>Public?</th>
+        <th>Update driver</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Policy Handbook</td>
+        <td>1</td>
+        <td>Charter Commission LEA compliance mandate; covers 30+ required policy domains; primary authorizer-facing document</td>
+        <td>Board / Head of Schools</td>
+        <td>Yes</td>
+        <td>Annual; Commission updates</td>
+      </tr>
+      <tr>
+        <td>Financial Policies &amp; Procedures</td>
+        <td>1</td>
+        <td>Distinct federal compliance mandate (2 CFR 200); auditor-facing; technical fiscal controls inappropriate inside general Policy Handbook</td>
+        <td>Board Treasurer / Exec Director</td>
+        <td>Yes</td>
+        <td>Annual; 2 CFR changes</td>
+      </tr>
+      <tr>
+        <td>Wellness Policy (IM 4.146)</td>
+        <td>2</td>
+        <td>USDA/HHFKA federal mandate; required to be publicly posted; annual assessment cycle; content spans nutrition, PE, SEL, and health — too broad for any other document</td>
+        <td>Head of Schools (Wellness Coordinator)</td>
+        <td>Yes</td>
+        <td>Annual; USDA standards</td>
+      </tr>
+      <tr>
+        <td>Emergency Operations Plan</td>
+        <td>2</td>
+        <td>SAVE Act mandate (T.C.A. § 49-6-804); distributed to law enforcement; confidential and exempt from public records; contains sensitive building/contact data inappropriate to include in any public document</td>
+        <td>Director of Operations</td>
+        <td>No (confidential)</td>
+        <td>Annual; law enforcement review</td>
+      </tr>
+      <tr>
+        <td>Employee Handbook</td>
+        <td>3</td>
+        <td>Dedicated HR document for a specific audience (staff); contains compensation, leave, and benefits detail that doesn't belong in board-level or public documents; signed by each employee</td>
+        <td>Head of Schools / Director of Operations</td>
+        <td>No (internal)</td>
+        <td>Annual (pre-service); as benefits change</td>
+      </tr>
+      <tr>
+        <td>Student &amp; Family Handbook</td>
+        <td>4</td>
+        <td>Family-facing audience distinct from all internal documents; school culture and program overview that wouldn't belong in any compliance document; public-facing and branded</td>
+        <td>Head of Schools</td>
+        <td>Yes</td>
+        <td>Annual (July)</td>
+      </tr>
+      <tr>
+        <td>HACCP Food Safety Plan</td>
+        <td>5</td>
+        <td>USDA technical requirement for NSLP/SBP; managed by FSMC (Panache) in partnership with school; specific enough to require its own update process; referenced from Wellness Policy</td>
+        <td>Director of Operations + FSMC</td>
+        <td>No (operational)</td>
+        <td>Annual; menu changes; USDA audits</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout principle" style="margin-top:20px">
+    <strong>Note on the acknowledgment form (Doc 2):</strong> This document should be retired. The Employee Handbook now contains its own acknowledgment page, making the standalone form redundant. Maintaining two acknowledgment vehicles for the same document creates personnel record confusion. The Employee Handbook acknowledgment page is sufficient and should be the only signed record on file.
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- VIEW 3: SINGLE-SOURCE RULES -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="view-single">
+
+  <p class="section-title">Single-Source Rules — What Exists Only Once</p>
+  <p class="section-lead">These are the policy domains where the current document set has created costly duplication. For each domain, one document owns the rule. Every other document may reference it briefly — it may not restate, paraphrase into policy, or create exceptions. The reference should name the authoritative document explicitly.</p>
+
+  <div class="callout" style="background:#fef0dc;border-left:4px solid #c97a1a;color:#7a4a00;margin-bottom:20px">
+    <strong>Three compliance frameworks now govern INCS policy:</strong> In addition to the internal document hierarchy, three external frameworks create binding requirements that must be addressed across the document set. (1) <strong>TPCSC Subrecipient Monitoring Tool (revised 1/25/2026)</strong> — governs ESSA/IDEA program compliance, fiscal monitoring, personnel records, time-and-effort certifications, and whistleblower notifications. (2) <strong>TN Child Care Standards, Chapter 0520-12-01 (Feb 2024)</strong> — applies to INCS as a state-approved Montessori school program; governs staff age minimums (21+), pre-service orientation, annual training curriculum (13 required topics), medical fitness documentation, background check sequencing (before employment, not after), and posted compliance requirements. (3) <strong>Employee Handbook 2026-27</strong> — the updated handbook now explicitly acknowledges DHS-regulated programming requirements, but several Child Care Standards requirements are not yet captured in any current document.
+  </div>
+
+  <div class="callout principle">
+    <strong>How to reference without reproducing:</strong> Instead of restating the reimbursement rules in the Employee Handbook, write: "Reimbursements are governed by the INCS Financial Policies &amp; Procedures (Section: Employee Reimbursements). Employees must follow that policy when submitting any reimbursement request." One sentence. No duplication. No drift.
+  </div>
+
+  <div class="rules-grid">
+
+    <div class="rule-card">
+      <h4>Conflict of Interest</h4>
+      <p>A single unified COI policy covering Board members (voting/non-voting disclosure, recusal) and all key administrative staff (annual disclosure, outside employment). The current split between Policy Handbook (Board-only) and Financial Policies (all staff) creates different rules for different audiences with no clear hierarchy.</p>
+      <span class="lives-in">Lives in: Policy Handbook (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Employee Reimbursements</h4>
+      <p>One reimbursement policy: emergency-only with a defined submission process. Currently the Financial Policies says "exceptional cases only" while the Employee Handbook implies a broader standard. The Financial Policies version is more specific and federally compliant — it governs. The Employee Handbook references it.</p>
+      <span class="lives-in">Lives in: Financial Policies (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Harassment Policy</h4>
+      <p>One definition of harassment, one protected category list, one reporting procedure. Currently exists in three versions: Policy Handbook (Title IX + full), Employee Handbook (staff-facing), Family Handbook (family-facing summary). The Policy Handbook version is authoritative. The Employee Handbook and Family Handbook may summarize and reference it, but may not define protected categories differently or create different reporting thresholds.</p>
+      <span class="lives-in">Lives in: Policy Handbook (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>FERPA Notice &amp; Opt-Out</h4>
+      <p>One FERPA policy, one opt-out form, one directory information list. Currently the Policy Handbook and Family Handbook both carry full FERPA notices. The Policy Handbook is authoritative. The Family Handbook should contain a short paragraph and a link/reference. The annual opt-out notice to families is a separate annual communication — not something reprinted in the handbook each year.</p>
+      <span class="lives-in">Lives in: Policy Handbook (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Inventory &amp; Asset Management</h4>
+      <p>One capitalization threshold ($5,000), one tagging process, one disposal procedure. Currently split between Policy Handbook (procedures) and Financial Policies (federal compliance framing) with slightly different definitions. Financial Policies is the more precisely drafted document and aligns with 2 CFR 200 — it governs. Policy Handbook references it.</p>
+      <span class="lives-in">Lives in: Financial Policies (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Records Retention</h4>
+      <p>One retention schedule that maps Commission requirements to federal 2 CFR 200 timelines. Currently the Policy Handbook references Commission schedules; the Financial Policies cites 2 CFR 200 7-year rules; the EOP mandates 5-year drill records. A single master retention schedule in the Policy Handbook's appendix resolves all three, with footnotes to source authority.</p>
+      <span class="lives-in">Lives in: Policy Handbook appendix (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Travel Policy</h4>
+      <p>One travel policy covering authorization, mileage rate (IRS), per diem, receipts, and federal compliance. Currently the Policy Handbook has a thin framework; the Financial Policies has the substantive rules; the Employee Handbook handles mileage reimbursement. Financial Policies governs. The Policy Handbook travel section becomes a one-paragraph reference. The Employee Handbook's mileage section references Financial Policies.</p>
+      <span class="lives-in">Lives in: Financial Policies (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Background Checks</h4>
+      <p>One background check policy covering employees, contractors, service providers, and volunteers with student access. Currently Employee Handbook covers employees only; EOP Appendix I covers all categories plus RAP Back monitoring. EOP Appendix is more complete. The unified policy should live in the Employee Handbook (for staff context) and EOP Appendix I should reference it — not maintain a separate version.</p>
+      <span class="lives-in">Lives in: Employee Handbook (Tier 3)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>School Safety &amp; Emergency Response</h4>
+      <p>The EOP is the authoritative safety document. The Policy Handbook's current "School Safety and Emergency Response Plan" section should be reduced to two paragraphs: a summary of the school's commitment and a reference to the EOP as the governing document. The Family Handbook's drill section should reference the EOP's required drill schedule, not reproduce a partial summary of it.</p>
+      <span class="lives-in">Lives in: EOP (Tier 2) — referenced from Policy Handbook</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Suicide Prevention</h4>
+      <p>One suicide prevention policy covering student risk identification, staff reporting obligations, training requirements (TCA 49-6-3004: 2 hrs annual), and postvention. Currently split between Policy Handbook (full policy) and Wellness Policy (training goal) and EOP (tactical hazard sheet). Policy Handbook is authoritative. Wellness Policy references it for training tracking. EOP hazard sheet references it for response protocol.</p>
+      <span class="lives-in">Lives in: Policy Handbook (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Acceptable Use of Technology</h4>
+      <p>One AUP covering students and staff — device use, prohibited conduct, privacy expectations, data ownership, AI use. Currently Policy Handbook has a full AUP for students; Employee Handbook has a staff IT policy; Family Handbook has a truncated student version that defers AI to MNPS. One consolidated AUP should cover both audiences, live in the Policy Handbook, and be summarized in the Employee and Family handbooks.</p>
+      <span class="lives-in">Lives in: Policy Handbook (Tier 1)</span>
+    </div>
+
+    <div class="rule-card">
+      <h4>Mission Statement</h4>
+      <p>One mission statement, consistently worded, used everywhere. Currently the Employee Handbook mission ("K-8 students… college and career ready") materially differs from the Family Handbook mission ("develop healthy, happy, whole humans… Montessori"). Board should adopt a single official mission statement; all documents use it verbatim.</p>
+      <span class="lives-in">Lives in: Policy Handbook (Tier 1) — used verbatim everywhere</span>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <p style="font-weight:600;font-size:14px;color:var(--navy);margin-bottom:12px">Operational Standards That Should Be Referenced, Never Reproduced</p>
+  <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">These are external frameworks INCS is required to comply with. They change on their own schedule. INCS should reference them by name and cite the current version — not reproduce their content, which would require INCS to update its own documents every time the external standard changes.</p>
+
+  <table class="ref-table">
+    <thead>
+      <tr>
+        <th>Standard / Regulation</th>
+        <th>INCS must reference it in</th>
+        <th>INCS must NOT do</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2 CFR 200 (Uniform Guidance)</td>
+        <td>Financial Policies — cite the relevant subpart by number for each requirement</td>
+        <td>Reproduce the cost principles or procurement standards in full — they will change</td>
+      </tr>
+      <tr>
+        <td>USDA Smart Snacks Standards</td>
+        <td>Wellness Policy Appendix B — reference and link to USDA FNS</td>
+        <td>Reproduce the full nutrient table — it changes; the current Appendix B is an acceptable summary but should note the primary source</td>
+      </tr>
+      <tr>
+        <td>FERPA (20 U.S.C. § 1232g)</td>
+        <td>Policy Handbook — cite the statute; provide required annual notice language</td>
+        <td>Create a custom FERPA notice that diverges from DOE-approved language</td>
+      </tr>
+      <tr>
+        <td>TN SAVE Act (T.C.A. § 49-6-801–818)</td>
+        <td>EOP — cite specific subsections for each requirement</td>
+        <td>Summarize SAVE Act requirements in the Policy Handbook as if INCS wrote the standard</td>
+      </tr>
+      <tr>
+        <td>FMLA (29 U.S.C. § 2601)</td>
+        <td>Employee Handbook — the current FMLA section is appropriate and thorough</td>
+        <td>Modify FMLA eligibility thresholds or create exceptions to federal minimums</td>
+      </tr>
+      <tr>
+        <td>TN Child Care Standards (Chapter 0520-12-01)</td>
+        <td>Employee Handbook — cite specific rule numbers for staff age minimum, pre-service orientation, and annual training requirements; Financial Policies (background check timing); EOP Appendix I (Vulnerable Persons Registry as a separate check)</td>
+        <td>Reproduce the full rule text; the standards are enforceable by TDOE and change independently of INCS policy update cycles</td>
+      </tr>
+      <tr>
+        <td>41 U.S.C. 4712 (Federal Whistleblower Protection)</td>
+        <td>Financial Policies (federal grants section) AND Employee Handbook — both must include written employee notification; cite statute by number</td>
+        <td>Ignore this requirement in the Financial Policies — TPCSC fiscal monitoring (2 CFR § 200.217) explicitly checks for it</td>
+      </tr>
+      <tr>
+        <td>2 CFR § 200.430 (Time-and-Effort Certifications)</td>
+        <td>Financial Policies — establish semi-annual certification process for single-award employees; name the responsible role and form</td>
+        <td>Treat time-and-effort as a general reference — TPCSC monitoring verifies specific semi-annual certifications and after-the-fact distribution records</td>
+      </tr>
+      <tr>
+        <td>MNPS AI Policy</td>
+        <td>Should NOT be referenced as governing — INCS is authorized by TPCSC, not MNPS</td>
+        <td>Continue deferring entirely to an external policy that may not legally apply; INCS must adopt its own AI policy</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- VIEW 4: APPENDICES -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="view-appendices">
+
+  <p class="section-title">What Becomes an Appendix</p>
+  <p class="section-lead">Appendices are policy-supporting content that is too detailed or specialized for the policy body, but too important to exist separately. An appendix lives inside its parent document, is updated when the parent is updated, and shares the parent's access controls. Content becomes an appendix when it: (a) is referenced by the body, (b) would clutter the body, and (c) has no independent life outside that parent.</p>
+
+  <div class="callout principle">
+    <strong>The appendix test:</strong> If a piece of content could be removed from a document and the document's core compliance would be unaffected, it's probably an appendix. If removing it would create a compliance gap, it belongs in the body. Forms, schedules, reference tables, and technical standards are almost always appendices.
+  </div>
+
+  <!-- Policy Handbook appendices -->
+  <div class="appendix-section">
+    <div class="appendix-header">
+      <span class="doc-label">Tier 1</span>
+      <span class="doc-name">Policy Handbook — Proposed Appendices</span>
+    </div>
+    <div class="appendix-body">
+      <ul>
+        <li>FERPA Directory Information Opt-Out Form (currently in body — move to appendix)</li>
+        <li>Unified Records Retention Schedule (consolidates Commission + 2 CFR 200 schedules)</li>
+        <li>Conflict of Interest Annual Disclosure Form</li>
+        <li>Grievance / Complaint Submission Form</li>
+        <li>Title IX Complaint Form and Investigation Procedure</li>
+        <li>ADA/504 Accommodation Request Form</li>
+        <li>Student Discipline Hearing Authority Procedures (currently in body — highly procedural; move to appendix)</li>
+        <li>Directory of Related Policy Documents (cross-reference map to all Tier 2–5 documents)</li>
+        <li>Document Revision Log</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Financial Policies appendices -->
+  <div class="appendix-section">
+    <div class="appendix-header">
+      <span class="doc-label">Tier 1</span>
+      <span class="doc-name">Financial Policies &amp; Procedures — Proposed Appendices</span>
+    </div>
+    <div class="appendix-body">
+      <ul>
+        <li>Expenditure Authorization Matrix (who can approve at each dollar threshold)</li>
+        <li>Procurement Checklist (SAM.gov verification, bid requirements, sole-source justification)</li>
+        <li>Employee Reimbursement Submission Form (currently a Jotform link — should be documented internally)</li>
+        <li>Credit / Debit Card Use Policy and Monthly Reconciliation Form</li>
+        <li>Employee vs. Independent Contractor Classification Checklist (IRS factors)</li>
+        <li>Prohibited Telecommunications Equipment List (covered entities per 2 CFR § 200.216)</li>
+        <li>Federal Grant Fund Tracking Summary Template</li>
+        <li>Capitalization and Depreciation Schedule</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Wellness Policy appendices -->
+  <div class="appendix-section">
+    <div class="appendix-header">
+      <span class="doc-label">Tier 2</span>
+      <span class="doc-name">School Nutrition &amp; Wellness Policy — Proposed Appendices</span>
+    </div>
+    <div class="appendix-body">
+      <ul>
+        <li>Appendix A: Healthy Snack &amp; Celebration Food Ideas (currently exists — retain)</li>
+        <li>Appendix B: USDA Smart Snacks in School Nutrition Standards (currently exists — retain with primary source citation)</li>
+        <li>Appendix C: HACCP-Based Food Safety Plan (currently a separate document — consolidate here as an appendix; convert from scanned images to text PDF)</li>
+        <li>Appendix D: Meal Modification Request Form</li>
+        <li>Appendix E: Annual Wellness Policy Assessment Report Template</li>
+        <li>Appendix F: Wellness Policy Coordinator Contact Information (to be completed and posted on website)</li>
+        <li>Appendix G: Healthy School Team Membership and Meeting Log</li>
+        <li>Appendix H: District vs. School Responsibility Resolution Table (clarifies which "District Responsibilities" are owned by INCS, MNPS, or TPCSC)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- EOP appendices -->
+  <div class="appendix-section">
+    <div class="appendix-header">
+      <span class="doc-label">Tier 2</span>
+      <span class="doc-name">Emergency Operations Plan — Proposed Appendices</span>
+    </div>
+    <div class="appendix-body">
+      <ul>
+        <li>Appendix A: Hazard Sheets (16 hazards — already exists, retain)</li>
+        <li>Appendix B: Special Needs Summary Sheet (currently all placeholders — must be completed)</li>
+        <li>Appendix C: Communications Plan (already exists)</li>
+        <li>Appendix D: Maps, Floorplans, and Blueprints (already exists)</li>
+        <li>Appendix E: COOP Plan (already exists)</li>
+        <li>Appendix F: Memorandum of Understanding — Donelson First Church Relocation (currently blank — must be signed)</li>
+        <li>Appendix G: Threat Assessment Policy and Procedures (already exists)</li>
+        <li>Appendix H: Safety Meetings, Training and Drill Schedule (already exists)</li>
+        <li>Appendix I: Background Check Policy (currently duplicates Employee Handbook — employee policy should reference Employee Handbook; this appendix should cover only non-employee categories: contractors, volunteers, service providers)</li>
+        <li>Appendix J: Glossary (already exists)</li>
+        <li>Appendix K: EOP Distribution Log (records who has received each version — currently missing)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Employee Handbook appendices -->
+  <div class="appendix-section">
+    <div class="appendix-header">
+      <span class="doc-label">Tier 3</span>
+      <span class="doc-name">Employee Handbook — Proposed Appendices</span>
+    </div>
+    <div class="appendix-body">
+      <ul>
+        <li>Acknowledgment of Receipt and At-Will Statement (currently the last page — retain but ensure it's the only acknowledgment form)</li>
+        <li>Employee Classification Summary Table</li>
+        <li>Benefits Summary and Open Enrollment Guide (updated annually by benefits carrier)</li>
+        <li>PTO Accrual and Calendar Table</li>
+        <li>Background Check Policy (unified — covers employees, contractors, volunteers)</li>
+        <li>Technology Loan Agreement and Inventory Form</li>
+        <li>Montessori Certification Sponsorship Agreement Template (referenced in handbook body as "separate agreement" — should be formalized and attached)</li>
+        <li>Emergency Contact and Staff Skills Survey (currently an EOP appendix — more appropriately an HR document)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Family Handbook appendices -->
+  <div class="appendix-section">
+    <div class="appendix-header">
+      <span class="doc-label">Tier 4</span>
+      <span class="doc-name">Student &amp; Family Handbook — Proposed Appendices</span>
+    </div>
+    <div class="appendix-body">
+      <ul>
+        <li>Academic Calendar (currently in body — move to appendix for easier annual update)</li>
+        <li>FERPA Short-Form Notice and Opt-Out Instruction (replaces the full FERPA policy reproduction — direct families to the full policy in the Policy Handbook)</li>
+        <li>Attendance Intervention Summary (mirrors the full policy table from Policy Handbook)</li>
+        <li>Dress Code Photo Guide (optional visual reference for families)</li>
+        <li>School Supply List</li>
+        <li>Emergency Contact and Authorization Form</li>
+        <li>Technology / Device Agreement (student-facing summary of the AUP)</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- VIEW 5: IMPLEMENTATION SEQUENCE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="view" id="view-sequence">
+
+  <p class="section-title">Implementation Sequence</p>
+  <p class="section-lead">Architecture decisions are only as good as their execution. This sequence prioritizes compliance gaps and safety risks first, then resolves structural conflicts, then builds the long-term governance infrastructure. Updated June 2026 to reflect remediation progress across three document tracks.</p>
+
+  <div class="callout principle">
+    <strong>Sequencing principle:</strong> Fix the things that create legal or safety exposure first. Structural elegance is a second-order concern. A school with a complete FERPA notice and a working EOP is in better shape than a school with a perfectly organized document hierarchy but missing signatures.
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+    <span style="background:#e4f4ec;color:#1e6e4e;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600">✓ COMPLETE — item closed</span>
+    <span style="background:#fef3e2;color:#c97a1a;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600">⏳ IN PROGRESS — decisions pending</span>
+    <span style="background:#fde8e8;color:#b83232;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:600">⚠ OPEN — not yet started</span>
+  </div>
+
+  <p style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:12px;margin-top:4px">Phase 1 — Immediate Fixes (Before June 30, 2026)</p>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Fix the FERPA opt-out date placeholder in the Policy Handbook</h4>
+      <p>COMPLETE — FERPA opt-out deadline set to 30 days after first day of school. PRRC designation confirmed (Jonathan Salls). Embedded in Policy Handbook during Phase 1 remediation.</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Correct the school name in the Student/Family Handbook</h4>
+      <p>COMPLETE — Handbook cover and all internal references standardized to "Invictus Nashville Charter School, Student and Family Handbook 2026-27."</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Resolve the "Executive Director" vs. "Head of Schools" title inconsistency</h4>
+      <p>COMPLETE — Title resolution framework adopted. "Head of Schools or designee" used in academic/operational policy language; "Executive Director" used in governance contexts. Bridging language drafted and embedded in relevant sections. Dr. Brenda Jones dual-role arrangement documented.</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Name the Wellness Policy Coordinator</h4>
+      <p>COMPLETE — Jonathan Salls designated as Wellness Policy Coordinator. Embedded in Wellness Policy and cross-referenced in Policy Handbook.</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="border-left:4px solid #c97a1a">
+    <span class="priority-num" style="background:#fef3e2;color:#c97a1a;border:1px solid #c97a1a">⏳</span>
+    <div class="priority-body">
+      <h4>Complete all EOP placeholders and sign the MOU</h4>
+      <p>Still open. Fill population counts, office manager email, Donelson Library contact, Kroger contact. Complete and execute the MOU with Donelson First Church. Populate the Special Needs Summary Sheet (Appendix B). EOP cross-reference in the Student/Family Handbook Bullying Hazard Sheet also pending as a related action. These items are deferred but known — document set can advance while this track continues.</p>
+      <span class="meta" style="color:#c97a1a">In progress — deferred · Owner: Director of Operations</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="border-left:4px solid #c97a1a">
+    <span class="priority-num" style="background:#fef3e2;color:#c97a1a;border:1px solid #c97a1a">⏳</span>
+    <div class="priority-body">
+      <h4>Convert the HACCP Plan to a text-accessible document</h4>
+      <p>Still open. The current HACCP Plan is a PDF of scanned images — not text-searchable or digitally linkable. Convert to searchable PDF or DOCX and reference from the Wellness Policy's Nutrition Services section.</p>
+      <span class="meta" style="color:#c97a1a">In progress — deferred · Owner: Director of Operations + Panache Catering · Deadline: Before 2026-27 launch</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:12px">Phase 2a — Document Remediation (Complete as of June 2026)</p>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Remediate the Policy Handbook</h4>
+      <p>COMPLETE — All 36 sections drafted in compliance-ready form. Orphaned standalone documents (restraint, homelessness, foster care, enrollment, sexual abuse prevention, translation) embedded directly into the Policy Handbook. Legitimately standalone documents (EOP, Financial Policies, Wellness Policy) retained as standalone and referenced. Two placeholders remain open by decision: library development procedure (Section 16) and reinstatement review committee membership (Section 29). Neither prevents board adoption.</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026 · 2 placeholders held open by leadership decision</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Remediate the Student and Family Handbook</h4>
+      <p>COMPLETE — Remediated against 13 original gap items, all 25 TPCSC Student Handbook Requirements, Tennessee Child Care Standards (0520-12-01-.07), and three new legislative items (Pub. Ch. 808 on K-5 devices, Pub. Ch. 850 on classroom evacuation notification, Instructional Materials Assurance). Board adopts handbook as policy; operative language used throughout, no placeholders. Two items held open by decision: board determination on Commission LEA Policy 6304 full-text inclusion, and EOP cross-reference correction (separate document action).</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026 · 2 items held open by leadership decision</span>
+    </div>
+  </div>
+
+  <div class="priority-row" style="opacity:0.65;border-left:4px solid #1e6e4e">
+    <span class="priority-num" style="background:#1e6e4e;color:#fff">✓</span>
+    <div class="priority-body">
+      <h4 style="text-decoration:line-through;color:#6b7a9a">Remediate the Employee Handbook</h4>
+      <p>COMPLETE — 2026-27 version substantially improved. Adds DHS dual background-check compliance, Section 7 Student Protection, federal whistleblower protections (41 U.S.C. 4712 cross-reference pending in Financial Policies), USDA nondiscrimination appendix, lactation accommodations, and explicit EOP cross-reference. Separate acknowledgment form (Doc 2) retired — handbook contains its own acknowledgment page. Child Care Standards compliance layer (age minimum, pre-service orientation, annual training curriculum, medical fitness documentation) flagged for Phase 2b action.</p>
+      <span class="meta" style="color:#1e6e4e">Closed · June 2026 · Child Care Standards compliance layer moves to Phase 2b</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:12px">Phase 2b — Remaining Architecture Work (July–August 2026, Before School Year Launch)</p>
+
+  <div class="priority-row">
+    <span class="priority-num med">7</span>
+    <div class="priority-body">
+      <h4>Adopt a single canonical mission statement</h4>
+      <p>Board should formally adopt one mission statement. Update every document that contains a mission statement to use the exact adopted wording. The two current versions (Employee Handbook vs. Family Handbook) reflect a real strategic ambiguity that should be resolved at the board level before language is standardized.</p>
+      <span class="meta">Owner: Board / Head of Schools · Before: July Board meeting</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">8</span>
+    <div class="priority-body">
+      <h4>Consolidate the Conflict of Interest policy into one document</h4>
+      <p>Draft one unified COI policy covering both Board members and key administrative staff. Determine whether it lives in the Policy Handbook or Financial Policies (recommend Policy Handbook — it's a governance issue, not just a financial one). Update both documents so only the authoritative location contains the rule; the other references it.</p>
+      <span class="meta">Owner: Head of Schools + Board Chair · Before: August</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">9</span>
+    <div class="priority-body">
+      <h4>Reconcile the three reimbursement policies into one</h4>
+      <p>Financial Policies governs. The Employee Handbook's reimbursement section should be replaced with a paragraph referencing the Financial Policies and naming the submission form/process. The Policy Handbook's Travel section should do the same. One process, one form, one place.</p>
+      <span class="meta">Owner: Director of Operations · Before: August</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">10</span>
+    <div class="priority-body">
+      <h4>Reduce the Policy Handbook's Safety section to a reference</h4>
+      <p>The "School Safety and Emergency Response Plan" section in the Policy Handbook duplicates the EOP. Replace it with two paragraphs: (1) a brief statement of INCS's safety commitment and compliance with T.C.A. § 49-6-801, and (2) an explicit reference to the Emergency Operations Plan as the governing document. Note the EOP's confidential status and who to contact for questions.</p>
+      <span class="meta">Owner: Director of Operations · Before: August</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">11</span>
+    <div class="priority-body">
+      <h4>Unify the background check policy and update the EOP appendix</h4>
+      <p>The Employee Handbook should contain the unified background check policy covering employees, contractors, service providers, and volunteers. EOP Appendix I should be revised to reference the Employee Handbook for employee requirements and contain only the non-employee categories (contractors, volunteers, service providers) that are EOP-specific.</p>
+      <span class="meta">Owner: Director of Operations · Before: August</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">12</span>
+    <div class="priority-body">
+      <h4>Fix the EOP cross-reference in the Bullying Hazard Sheet</h4>
+      <p>The EOP Bullying Hazard Sheet currently directs staff to "the Family Handbook" for bullying policy. Change the reference to the Policy Handbook. Audit all other EOP hazard sheets for incorrect cross-references. Add a document map to the EOP front matter listing all documents referenced within it.</p>
+      <span class="meta">Owner: Director of Operations · Before: August (before drills begin)</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">13</span>
+    <div class="priority-body">
+      <h4>Adopt a school-specific AI policy</h4>
+      <p>Draft an AI use policy for students and staff. It may draw from MNPS guidance as a baseline but must be formally adopted by INCS leadership and added to the Policy Handbook. Include in the revised AUP section. Summarize in the Family Handbook and Employee Handbook.</p>
+      <span class="meta">Owner: Head of Schools · Before: July 15</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">A</span>
+    <div class="priority-body">
+      <h4>Add federal whistleblower written notification to Financial Policies</h4>
+      <p>TPCSC fiscal monitoring (2 CFR § 200.217) requires employees to be notified in writing of whistleblower protections under 41 U.S.C. 4712. The 2026-27 Employee Handbook cites Tennessee whistleblower law (T.C.A. § 50-1-304) but the federal statute is not yet in the Financial Policies. Add a written employee notification provision citing 41 U.S.C. 4712 to the Financial Policies — this is a direct TPCSC monitoring checklist item.</p>
+      <span class="meta">Owner: Director of Operations · Before: Next TPCSC self-assessment submission · Affects: Financial Policies</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">B</span>
+    <div class="priority-body">
+      <h4>Establish semi-annual time-and-effort certification process</h4>
+      <p>TPCSC fiscal monitoring requires semi-annual certifications for employees funded 100% by a single federal award, plus after-the-fact monthly distribution records for split-funded employees. Create a specific form and process, assign a responsible role, set certification dates (typically December and June), and document in the Financial Policies.</p>
+      <span class="meta">Owner: Director of Operations + back-office provider · Before: First certification date of 2026-27 year · Affects: Financial Policies</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">C</span>
+    <div class="priority-body">
+      <h4>Complete and sign all TPCSC monitoring assurance sections</h4>
+      <p>The 2025-26 TPCSC Subrecipient Monitoring Tool has blank signed assurance sections. Before submitting: fill all assurance sections with responsible staff names and signatures, resolve all flagged internal comments, and ensure the centralized student data tracking system is documented.</p>
+      <span class="meta">Owner: Dr. Brenda Jones + Adam Holdren + Stacey Jones · Deadline: Per Commission due date · Affects: TPCSC monitoring submission</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">D</span>
+    <div class="priority-body">
+      <h4>Child Care Standards compliance layer — Employee Handbook</h4>
+      <p>Four specific requirements from TN Child Care Standards (0520-12-01-.07) are not yet fully documented: (1) 21-year age minimum for all teaching staff hired after June 30, 2017; (2) 2-hour pre-service orientation checklist with completion log; (3) annual training curriculum covering all 13 required topics with documentation; (4) physician/clinician medical fitness statement on file within 10 days of hire, renewed every 3 years. Add all four to the Employee Handbook onboarding section and create supporting documentation forms.</p>
+      <span class="meta">Owner: Director of Operations · Before: August 1 · Affects: Employee Handbook, personnel records, job postings</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">E</span>
+    <div class="priority-body">
+      <h4>Clarify Vulnerable Persons Registry as a separate required check</h4>
+      <p>Child Care Standards require three distinct checks: TBI/FBI background, Vulnerable Persons Registry, and Sex Offender Registry — each with its own process, timeline, and re-check schedule (fingerprints re-taken every 5 years). Revise the Employee Handbook to explicitly enumerate all three checks. Also resolve background check timing: clearances must be completed before an employee assumes duties, not after start date.</p>
+      <span class="meta">Owner: Director of Operations · Before: August 1 · Affects: Employee Handbook, EOP Appendix I</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:12px;margin-top:28px">Phase 2b — Compliance Gap Remediation (Before School Year Launch, July–August 2026)</p>
+
+  <div class="priority-row">
+    <span class="priority-num high">A</span>
+    <div class="priority-body">
+      <h4>Resolve background check timing — pre-employment, not post-start</h4>
+      <p>Child Care Standards (0520-12-01-.07(15)) require TBI/FBI background, Vulnerable Persons Registry, and Sex Offender Registry checks to be completed BEFORE an employee assumes duties. The current Employee Handbook allows reimbursement after start date and acknowledges that clearances may be pending after hire. Revise both the hiring procedure and handbook language to make pre-employment clearance unambiguous. Add a written hold process for cases where agency determinations are delayed.</p>
+      <span class="meta">Owner: Director of Operations · Before: Revised for all 2026-27 hires · Affects: Employee Handbook + hiring checklist</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">B</span>
+    <div class="priority-body">
+      <h4>Create a staff pre-service orientation checklist (2-hour requirement)</h4>
+      <p>Child Care Standards require every new employee (including substitutes and volunteers) to complete a 2-hour pre-service orientation before assuming duties covering: program philosophy, emergency procedures, discipline policies, child abuse reporting, SIDS, and child reception/dismissal. Create a documented checklist, assign it to the Director of Operations to administer, and add a completion log to the personnel file system.</p>
+      <span class="meta">Owner: Director of Operations · Before: August 1 · Affects: Employee Handbook (onboarding section), staff records</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">C</span>
+    <div class="priority-body">
+      <h4>Document the annual staff training curriculum (13 required topics)</h4>
+      <p>Child Care Standards require annual instruction within the first 2 weeks and each year after on 13 specific topics including child abuse detection, food allergies, shaken baby syndrome, abusive head trauma, safe sleep procedures, disease control, and developmentally appropriate practices. The current bloodborne pathogen training covers one item. Create an annual training calendar and documentation process. Add to the Employee Handbook's compliance training section. All training must be documented in personnel files and available for TDOE review.</p>
+      <span class="meta">Owner: Head of Schools + Director of Operations · Before: August 1 · Affects: Employee Handbook, personnel records</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">D</span>
+    <div class="priority-body">
+      <h4>Add staff medical fitness documentation requirement</h4>
+      <p>Child Care Standards require a written statement from a licensed physician, psychologist, or clinician verifying each staff member is physically capable of caring for children in a group setting. This must be on file within 10 calendar days of employment and renewed every 3 years. Add this to the Employee Handbook's onboarding requirements, to the hiring checklist, and to the personnel records documentation list. No current document references this requirement.</p>
+      <span class="meta">Owner: Director of Operations · Before: August 1 · Affects: Employee Handbook (Section 2 or onboarding), personnel file requirements</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">E</span>
+    <div class="priority-body">
+      <h4>Add federal whistleblower written notification to Financial Policies</h4>
+      <p>TPCSC fiscal monitoring (2 CFR § 200.217) requires employees to be notified in writing of whistleblower protections under 41 U.S.C. 4712 (federal fraud reporting). The 2026-27 Employee Handbook now cites Tennessee whistleblower law (T.C.A. § 50-1-304) but the federal statute is not referenced. The Financial Policies — the document governing federal grant use — must include a written employee notification provision citing 41 U.S.C. 4712. This is a direct TPCSC monitoring checklist item.</p>
+      <span class="meta">Owner: Director of Operations · Before: Next TPCSC self-assessment submission · Affects: Financial Policies</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">F</span>
+    <div class="priority-body">
+      <h4>Establish semi-annual time-and-effort certification process</h4>
+      <p>TPCSC fiscal monitoring requires semi-annual certifications for employees funded 100% by a single federal award, plus after-the-fact monthly distribution records for employees split-funded across multiple programs. Create a specific form and process, assign a responsible role (Director of Operations / back-office provider), set the certification dates (typically December and June), and document this in the Financial Policies. This is a recurring TPCSC monitoring finding when absent.</p>
+      <span class="meta">Owner: Director of Operations + back-office provider · Before: First certification date of 2026-27 year · Affects: Financial Policies</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">F</span>
+    <div class="priority-body">
+      <h4>Correct PTO rollover language for 12-month employees — Employee Handbook Section 10</h4>
+      <p>Current language states "PTO does not roll over. Any days not used or sold back are forfeited at year end" with no distinction between employee types. 12-month (calendar year) employees are allowed to carry over up to 5 days. Section 10 must be revised to make this distinction explicit: the no-rollover rule applies to 10-month school calendar employees; 12-month employees may carry over up to 5 days. Confirm whether the sell-back option (up to 3 days at $150/day) applies to 12-month employees as well or is limited to 10-month staff, and document accordingly.</p>
+      <span class="meta">Owner: Director of Operations · Before: Next accrual cycle / 2026-27 launch · Affects: Employee Handbook Section 10</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num high">G</span>
+    <div class="priority-body">
+      <h4>Complete and sign all TPCSC monitoring assurance sections</h4>
+      <p>The 2025-26 TPCSC Subrecipient Monitoring Tool has blank signed assurance sections — no names, titles, or signatures are present. Internal comments indicate unresolved data questions (student assessment data centralization, EL lesson plans). Before submitting: fill all assurance sections with responsible staff names and signatures, resolve the flagged comments, and ensure the centralized student data tracking system Adam Holdren referenced is documented. This is the most immediate compliance deliverable.</p>
+      <span class="meta">Owner: Dr. Brenda Jones (principal signature) + Adam Holdren + Stacey Jones · Deadline: Per Commission due date · Affects: TPCSC monitoring submission</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">H</span>
+    <div class="priority-body">
+      <h4>Add 21-year staff age minimum to hiring criteria</h4>
+      <p>Child Care Standards require all teachers, assistant teachers, directors, and assistant directors hired after June 30, 2017 to be at least 21 years of age. This hiring minimum is not documented anywhere in the current INCS policy set. Add it to the Employee Handbook's employment section and to any hiring checklist or job description templates. Applies to substitutes in teaching roles as well.</p>
+      <span class="meta">Owner: Director of Operations · Before: August 1 · Affects: Employee Handbook, job postings</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num med">I</span>
+    <div class="priority-body">
+      <h4>Clarify Vulnerable Persons Registry as a separate required check</h4>
+      <p>The Child Care Standards require three distinct checks: TBI/FBI background, Vulnerable Persons Registry, and Sex Offender Registry — each has its own process, timeline, and re-check schedule (fingerprints must be re-taken every 5 years). The Employee Handbook and EOP Appendix I currently describe these as a unified "background check process." Revise both documents to explicitly enumerate all three checks, their re-check schedules, and the exclusionary criteria for the Vulnerable Persons Registry.</p>
+      <span class="meta">Owner: Director of Operations · Before: August 1 · Affects: Employee Handbook, EOP Appendix I</span>
+    </div>
+  </div>
+
+  <p style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:12px">Phase 3 — Long-Term Governance Infrastructure (Ongoing)</p>
+
+  <div class="priority-row">
+    <span class="priority-num low">15</span>
+    <div class="priority-body">
+      <h4>Add a Policy Directory appendix to the Policy Handbook</h4>
+      <p>A single-page table listing every standalone policy document in the INCS architecture: document name, tier, owner, last revision date, next review date, public or confidential, and location (physical and digital). Updated annually. This is how an auditor, a new staff member, or a board member finds the policy they're looking for.</p>
+      <span class="meta">Owner: Director of Operations · Before: September Board meeting</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num low">16</span>
+    <div class="priority-body">
+      <h4>Establish an annual policy review calendar</h4>
+      <p>Assign a review month to every standalone document: Policy Handbook (May, Board meeting), Financial Policies (April, with budget cycle), Wellness Policy (April, before annual assessment deadline), EOP (June, end of year), Employee Handbook (July, before staff onboarding), Family Handbook (July, before distribution). Designate backup reviewers. Put it on the board calendar.</p>
+      <span class="meta">Owner: Head of Schools · Ongoing</span>
+    </div>
+  </div>
+
+  <div class="priority-row">
+    <span class="priority-num low">17</span>
+    <div class="priority-body">
+      <h4>Resolve the Wellness Policy's "District vs. School" responsibility ambiguity</h4>
+      <p>Every section of the Wellness Policy that lists "District Responsibilities" needs to be reviewed and resolved: Does MNPS own this function? TPCSC? INCS directly? Where INCS owns it, name the role. Where an external party owns it, document how INCS confirms compliance. Add a resolution table as Appendix H. This is an ongoing USDA compliance risk until it is resolved.</p>
+      <span class="meta">Owner: Head of Schools + Wellness Policy Coordinator · By next annual assessment</span>
+    </div>
+  </div>
+
+</div>
+
+</div><!-- /content -->
+
+<script>
+function showView(name, tab) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  tab.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>
