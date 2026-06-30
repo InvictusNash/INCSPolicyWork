@@ -1,56 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Invictus Nashville Policy Portal</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invictus Nashville Policy & Operations Portal</title>
 
     <style>
         body {
-            font-family: Arial, sans-serif;
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background: #f4f6f8;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 25px;
+            line-height: 1.6;
         }
 
-        h1 {
-            color: #032B43;
+        .header {
+            background: #032B43;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .header h2 {
+            margin: 8px 0 20px;
+            font-weight: 400;
+            color: #d8e7f3;
+        }
+
+        .header p {
+            margin: 0;
+            max-width: 850px;
         }
 
         .card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
+            background: white;
+            border: 1px solid #d9dee3;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.05);
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #032B43;
         }
 
         a {
+            color: #1565C0;
             text-decoration: none;
-            color: #3F88C5;
-            font-weight: bold;
+            font-weight: 600;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        ul {
+            margin-top: 10px;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            font-size: .9em;
+            color: #666;
+            text-align: center;
         }
     </style>
 </head>
+
 <body>
 
-<h1>Invictus Nashville Charter School</h1>
-<h2>Policy & Operations Portal</h2>
+<div class="header">
+    <h1>Invictus Nashville Charter School</h1>
+    <h2>Policy & Operations Alignment Project</h2>
 
-<div class="card">
-    <a href="Architecture.html">System Architecture</a>
-    <p>View operational systems, software, and integrations.</p>
+    <p>
+        The <strong>Policy & Operations Alignment Project</strong> is a comprehensive initiative to
+        organize, standardize, and maintain the policies, procedures, systems, and operational
+        documentation that govern Invictus Nashville Charter School.
+    </p>
+
+    <p style="margin-top:15px;">
+        This project is intended to ensure alignment across the school's responsibilities as a
+        <strong>Tennessee public charter school</strong>, an
+        <strong>employer</strong>, and a
+        <strong>licensed preschool program</strong>, while providing a centralized resource for
+        operational guidance, compliance documentation, and institutional knowledge.
+    </p>
 </div>
 
 <div class="card">
-    <a href="InventoryMatrix.html">Inventory Matrix</a>
-    <p>View technology inventory and asset management information.</p>
+    <h3>System Architecture</h3>
+    <p>Documentation of operational systems, software platforms, integrations, and data flow.</p>
+    <a href="Architecture.html">View System Architecture →</a>
+</div>
+
+<div class="card">
+    <h3>Inventory Matrix</h3>
+    <p>Technology inventory, equipment tracking, asset assignments, and lifecycle management.</p>
+    <a href="InventoryMatrix.html">View Inventory Matrix →</a>
 </div>
 
 <div class="card">
     <h3>Policy Documents</h3>
 
+    <p>Core organizational policies and governing documents.</p>
+
     <ul>
         <li><a href="pdf/EmployeeHandbook.pdf">Employee Handbook</a></li>
-        <li><a href="pdf/FamilyHandbook.pdf">Student and Family Handbook</a></li>
+        <li><a href="pdf/FamilyHandbook.pdf">Student & Family Handbook</a></li>
     </ul>
+</div>
+
+<div class="footer">
+    Invictus Nashville Charter School • Policy & Operations Alignment Project
 </div>
 
 </body>
